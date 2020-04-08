@@ -8,3 +8,5 @@ terraform.tfvars
 terraform.tfstate
 
 terraform.tfstate.backup
+
+hola_lambda.zip
