@@ -1,0 +1,25 @@
+<html>
+<script>
+
+    function myFunction() {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                document.getElementById("hola-msg").innerHTML = this.responseText;
+            }
+        };
+        xhttp.open("GET", "${api_gateway_link}", true);
+        xhttp.send();
+    }
+
+</script>
+
+<body>
+    <div align="center"><br><br><br><br>
+        <h1><span id="hola-msg">Hi from the website!</span></h1>
+        <button onclick="myFunction()">Click me!</button><br>
+        <img src="https://s3.amazonaws.com/${bucket_name}/default_image.jpg">
+    </div>
+</body>
+
+</html>

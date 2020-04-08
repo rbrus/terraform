@@ -1,0 +1,10 @@
+.terraform/
+terraform
+terraform.exe
+
+
+terraform.tfvars
+
+terraform.tfstate
+
+terraform.tfstate.backup
