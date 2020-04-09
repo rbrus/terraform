@@ -12,3 +12,5 @@ terraform.tfstate.backup
 hola_lambda.zip
 
 index.html
+
+.terraform.tfstate.lock.info
