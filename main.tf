@@ -101,8 +101,12 @@ resource "aws_lambda_function" "hola_lambda" {
   role          = aws_iam_role.iam_for_hola_lambda.arn
   handler       = "hola_lambda.lambda_handler"
   source_code_hash = filebase64sha256("hola_lambda.zip")
-  runtime = "python3.6"
+  runtime       = "python3.6"
+  timeout       = 60
   #environment { variables = {} }
+  depends_on = [
+    aws_api_gateway_rest_api.hola_lambda_api_gateway
+  ]
 }
 
 #
@@ -127,10 +131,10 @@ resource "aws_api_gateway_method" "hola_lambda_method" {
 }
 
 resource "aws_api_gateway_integration" "hola_lambda_integration" {
-  rest_api_id          = aws_api_gateway_rest_api.hola_lambda_api_gateway.id
-  resource_id          = aws_api_gateway_method.hola_lambda_method.resource_id
-  http_method          = aws_api_gateway_method.hola_lambda_method.http_method
-  integration_http_method     = "GET"
+  rest_api_id                 = aws_api_gateway_rest_api.hola_lambda_api_gateway.id
+  resource_id                 = aws_api_gateway_method.hola_lambda_method.resource_id
+  http_method                 = aws_api_gateway_method.hola_lambda_method.http_method
+  integration_http_method     = aws_api_gateway_method.hola_lambda_method.http_method
   type                        = "AWS_PROXY"
   uri                         = aws_lambda_function.hola_lambda.invoke_arn
   depends_on = [
@@ -161,8 +165,8 @@ resource "aws_api_gateway_integration" "lambda_root" {
 }
 
 resource "aws_api_gateway_deployment" "hola_lambda_deployment" {
-  depends_on = [ aws_api_gateway_integration.hola_lambda_integration, 
-                 aws_api_gateway_integration.lambda_root ]
+  depends_on = [ aws_api_gateway_integration.hola_lambda_integration ] #, 
+                 #aws_api_gateway_integration.lambda_root ]
   rest_api_id = aws_api_gateway_rest_api.hola_lambda_api_gateway.id
   stage_name  = "hola_lambda_stage"
 }
