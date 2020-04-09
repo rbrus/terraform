@@ -67,6 +67,41 @@ resource "aws_s3_bucket" "webpage_bucket" {
 }
 
 #
+# API GATEWAY (PART1)
+#
+resource "aws_api_gateway_rest_api" "hola_lambda_api_gateway" {
+  name = "hola_lambda_rest_api_gateway"
+  description = "Hola! I am Serverless!"
+}
+
+resource "aws_api_gateway_resource" "hola_lambda_resource" {
+  rest_api_id = aws_api_gateway_rest_api.hola_lambda_api_gateway.id
+  parent_id   = aws_api_gateway_rest_api.hola_lambda_api_gateway.root_resource_id
+  path_part   = "hola_lambda_method"
+}
+
+resource "aws_api_gateway_method" "hola_lambda_method" {
+  rest_api_id   = aws_api_gateway_rest_api.hola_lambda_api_gateway.id
+  resource_id   = aws_api_gateway_resource.hola_lambda_resource.id
+  http_method   = "GET"
+  authorization = "NONE"
+  depends_on = [
+    aws_api_gateway_resource.hola_lambda_resource
+  ]
+}
+
+resource "aws_api_gateway_method_response" "hola_lambda_method_response" {
+  rest_api_id   = aws_api_gateway_rest_api.hola_lambda_api_gateway.id
+  resource_id   = aws_api_gateway_resource.hola_lambda_resource.id
+  http_method   = aws_api_gateway_method.hola_lambda_method.http_method
+  status_code   = "200"
+  response_models = { "application/json" = "Empty" }
+  depends_on = [
+    aws_api_gateway_method.hola_lambda_method
+  ]
+}
+
+#
 # LAMBDA
 #
 data "archive_file" "zip" {
@@ -77,7 +112,6 @@ data "archive_file" "zip" {
 
 resource "aws_iam_role" "iam_for_hola_lambda" {
   name = "iam_for_hola_lambda"
-
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -110,26 +144,8 @@ resource "aws_lambda_function" "hola_lambda" {
 }
 
 #
-# API GATEWAY
+# API GATEWAY (PART2)
 #
-resource "aws_api_gateway_rest_api" "hola_lambda_api_gateway" {
-  name = "hola_lambda_rest_api_gateway"
-  description = "Hola! I am Serverless!"
-}
-
-resource "aws_api_gateway_resource" "hola_lambda_resource" {
-  rest_api_id = aws_api_gateway_rest_api.hola_lambda_api_gateway.id
-  parent_id   = aws_api_gateway_rest_api.hola_lambda_api_gateway.root_resource_id
-  path_part   = "hola_lambda_method"
-}
-
-resource "aws_api_gateway_method" "hola_lambda_method" {
-  rest_api_id   = aws_api_gateway_rest_api.hola_lambda_api_gateway.id
-  resource_id   = aws_api_gateway_resource.hola_lambda_resource.id
-  http_method   = "GET"
-  authorization = "NONE"
-}
-
 resource "aws_api_gateway_integration" "hola_lambda_integration" {
   rest_api_id                 = aws_api_gateway_rest_api.hola_lambda_api_gateway.id
   resource_id                 = aws_api_gateway_method.hola_lambda_method.resource_id
@@ -137,28 +153,6 @@ resource "aws_api_gateway_integration" "hola_lambda_integration" {
   integration_http_method     = aws_api_gateway_method.hola_lambda_method.http_method
   type                        = "AWS_PROXY"
   uri                         = aws_lambda_function.hola_lambda.invoke_arn
-  depends_on = [
-    aws_lambda_function.hola_lambda
-  ]
-}
-
-#
-# EMPTY TEST ENDPOINT
-#
-resource "aws_api_gateway_method" "proxy_root" {
-  rest_api_id   = aws_api_gateway_rest_api.hola_lambda_api_gateway.id
-  resource_id   = aws_api_gateway_rest_api.hola_lambda_api_gateway.root_resource_id
-  http_method   = "ANY"
-  authorization = "NONE"
-}
-
-resource "aws_api_gateway_integration" "lambda_root" {
-  rest_api_id = aws_api_gateway_rest_api.hola_lambda_api_gateway.id
-  resource_id = aws_api_gateway_method.proxy_root.resource_id
-  http_method = aws_api_gateway_method.proxy_root.http_method
-  integration_http_method = "GET"
-  type                    = "AWS_PROXY"
-  uri                     = aws_lambda_function.hola_lambda.invoke_arn
   depends_on = [
     aws_lambda_function.hola_lambda
   ]
