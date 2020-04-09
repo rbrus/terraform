@@ -158,6 +158,16 @@ resource "aws_api_gateway_integration" "hola_lambda_integration" {
   ]
 }
 
+resource "aws_api_gateway_integration_response" "hola_lambda_integration_response" {
+  rest_api_id                 = aws_api_gateway_rest_api.hola_lambda_api_gateway.id
+  resource_id                 = aws_api_gateway_method.hola_lambda_method.resource_id
+  http_method                 = aws_api_gateway_method.hola_lambda_method.http_method
+  status_code                 = aws_api_gateway_method_response.hola_lambda_method_response.status_code
+  depends_on = [
+    aws_lambda_function.hola_lambda
+  ]
+}
+
 resource "aws_api_gateway_deployment" "hola_lambda_deployment" {
   depends_on = [ aws_api_gateway_integration.hola_lambda_integration ] #, 
                  #aws_api_gateway_integration.lambda_root ]
