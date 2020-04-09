@@ -1,3 +1,3 @@
-output "root_url" {
-  value = aws_api_gateway_deployment.hola_lambda_deployment.invoke_url
+output "webpage_url" {
+  value = aws_s3_bucket.webpage_bucket.website_endpoint
 }
