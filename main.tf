@@ -30,6 +30,7 @@ provider "archive" {}
 #
 locals {
   bucket_name = "hola-bucket-${random_pet.this.id}"
+  function_name = "hola_lambda"
   common_tags = {}
 }
 
@@ -110,6 +111,23 @@ data "archive_file" "zip" {
   output_path = "hola_lambda.zip"
 }
 
+resource "aws_lambda_permission" "lambda_permission" {
+  statement_id  = "allow_api_gateway_invoke"
+  action        = "lambda:InvokeFunction"
+  function_name = local.function_name
+  principal     = "apigateway.amazonaws.com"
+
+  # The /*/*/* part allows invocation from any stage, method and resource path within API Gateway REST API.
+  #  aws_api_gateway_deployment.hola_lambda_deployment.invoke_url
+  source_arn = format("%s/*/*/%s", 
+    aws_api_gateway_rest_api.hola_lambda_api_gateway.execution_arn,
+    aws_api_gateway_resource.hola_lambda_resource.path_part)
+  depends_on = [
+    aws_api_gateway_rest_api.hola_lambda_api_gateway,
+    aws_api_gateway_resource.hola_lambda_resource
+  ]
+}
+
 resource "aws_iam_role" "iam_for_hola_lambda" {
   name = "iam_for_hola_lambda"
   assume_role_policy = <<EOF
@@ -131,7 +149,7 @@ EOF
 
 resource "aws_lambda_function" "hola_lambda" {
   filename      = "hola_lambda.zip"
-  function_name = "hola_lambda"
+  function_name = local.function_name
   role          = aws_iam_role.iam_for_hola_lambda.arn
   handler       = "hola_lambda.lambda_handler"
   source_code_hash = filebase64sha256("hola_lambda.zip")
