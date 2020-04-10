@@ -116,9 +116,6 @@ resource "aws_lambda_permission" "lambda_permission" {
   action        = "lambda:InvokeFunction"
   function_name = local.function_name
   principal     = "apigateway.amazonaws.com"
-
-  # The /*/*/* part allows invocation from any stage, method and resource path within API Gateway REST API.
-  #  aws_api_gateway_deployment.hola_lambda_deployment.invoke_url
   source_arn = format("%s/*/*/%s", 
     aws_api_gateway_rest_api.hola_lambda_api_gateway.execution_arn,
     aws_api_gateway_resource.hola_lambda_resource.path_part)
