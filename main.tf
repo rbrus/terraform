@@ -256,25 +256,3 @@ resource "aws_s3_bucket_object" "image_file" {
 #    command = format("aws s3 sync %s/images s3://%s/images/", path.module, aws_s3_bucket.webpage_bucket.id)
 #  }
 #}
-
-#
-# EMPTY TEST ENDPOINT
-#
-#resource "aws_api_gateway_method" "proxy_root" {
-#  rest_api_id   = aws_api_gateway_rest_api.hola_lambda_api_gateway.id
-#  resource_id   = aws_api_gateway_rest_api.hola_lambda_api_gateway.root_resource_id
-#  http_method   = "ANY"
-#  authorization = "NONE"
-#}
-#
-#resource "aws_api_gateway_integration" "lambda_root" {
-#  rest_api_id = aws_api_gateway_rest_api.hola_lambda_api_gateway.id
-#  resource_id = aws_api_gateway_method.proxy_root.resource_id
-#  http_method = aws_api_gateway_method.proxy_root.http_method
-#  integration_http_method = "GET"
-#  type                    = "AWS_PROXY"
-#  uri                     = aws_lambda_function.hola_lambda.invoke_arn
-#  depends_on = [
-#    aws_lambda_function.hola_lambda
-#  ]
-#}
