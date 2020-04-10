@@ -201,7 +201,9 @@ resource "local_file" "index_file_template" {
   count = 1
   content = templatefile(format("%s/index_template.html", path.module), { 
       bucket_name = aws_s3_bucket.webpage_bucket.id, 
-      api_gateway_link = aws_api_gateway_deployment.hola_lambda_deployment.invoke_url
+      api_gateway_link = format("%s/%s",
+                            aws_api_gateway_deployment.hola_lambda_deployment.invoke_url, 
+                            aws_api_gateway_resource.hola_lambda_resource.path_part)
     })
   filename = format("%s/index.html", path.module)
   depends_on = [
