@@ -6,7 +6,7 @@ def lambda_handler(event, context):
         "headers": {
             "Access-Control-Allow-Origin": "*",
         },
-        "body": "¡Hola! from lambda function."
+        "body": "¡Hola! from the lambda function."
     }
 
     return resp

@@ -1,1 +1,5 @@
-terraform_0.12.24_linux_amd64
+Before clinking on the button.
+![Image of Yaktocat](before.png)
+
+After clicking on the button - after invoking lambda function through API gateway.
+![Image of Yaktocat](after.png)
